@@ -1,0 +1,43 @@
+# {{ ansible_managed }}
+
+# working directories of a project on a server
+working_directory '{{ app_path }}'
+
+# unicorn proccesses pid's
+pidfile     = '{{ unicorn_pid_path }}'
+pidfile_old = pidfile + '.oldbin'
+pid pidfile
+
+stderr_path '{{ unicorn_stderr_path }}'
+stdout_path '{{ unicorn_stdout_path }}'
+
+listen '{{ unicorn_sock_path }}'
+
+# main params
+worker_processes 3
+preload_app true
+timeout 30
+
+# garbage collector settings
+GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
+
+# before server start instructions
+before_exec do |server|
+  ENV["BUNDLE_GEMFILE"] = "{{ app_path }}/Gemfile"
+end
+
+# instructions for managing workers and db connection
+before_fork do |server, worker|
+  defined?(ActiveRecord::Base) && ActiveRecord::Base.connection.disconnect!
+
+  if File.exists?(pidfile_old) && server.pid != pidfile_old
+    begin
+      Process.kill("QUIT", File.read(pidfile_old).to_i)
+    rescue Errno::ENOENT, Errno::ESRCH
+    end
+  end
+end
+
+after_fork do |server, worker|
+  defined?(ActiveRecord::Base) && ActiveRecord::Base.establish_connection
+end

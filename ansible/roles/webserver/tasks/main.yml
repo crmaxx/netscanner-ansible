@@ -1,0 +1,12 @@
+---
+- include: remote.yml
+
+- name: Create and migrate DB
+  command: /bin/bash -l -c 'bundle exec rake db:create db:migrate' chdir={{ app_path }}
+  environment:
+    RAILS_ENV: '{{ rails_env }}'
+  sudo_user: '{{ user_name }}'
+  ignore_errors: yes
+  tags:
+    - rails
+    - db

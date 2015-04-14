@@ -1,0 +1,38 @@
+---
+- hosts: all
+  gather_facts: no
+  roles:
+    - { role: apt_proxy, when: use_apt_proxy }
+  tasks:
+    - name: Install python2.7
+      raw: apt-get update && apt-get install python2.7 python-setuptools
+
+    - name: Update apt cache
+      apt: update_cache=yes
+
+    - name: Install most needed utilities
+      apt: name={{ item }}
+      with_items:
+        - htop
+        - mc
+        - sudo
+        - aptitude
+
+    - name: upgrade system
+      apt: upgrade=safe
+
+    - name: fix locales
+      shell: >
+        locale-gen en_US.UTF-8 && dpkg-reconfigure -fnoninteractive locales && update-locale LC_ALL="en_US.UTF-8" LANG="en_US.UTF-8" LANGUAGE="en_US" && touch ~/.locale_ok creates=~/.locale_ok
+
+- hosts: postgresql
+  roles:
+    - postgresql
+
+- hosts: application
+  handlers:
+  roles:
+    - base
+    - { role: ruby, tags: ruby }
+    - vim
+    - webserver
