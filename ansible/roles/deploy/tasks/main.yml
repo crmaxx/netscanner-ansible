@@ -1,7 +1,8 @@
 ---
 - include_vars: ../../unicorn/defaults/main.yml
 
-- set_fact: this_release_path={{ releases_path }}/{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}
+- set_fact: revision={{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}
+- set_fact: this_release_path={{ releases_path }}/{{ revision }}
 
 - debug: msg="New release path {{ this_release_path }}"
 
@@ -55,3 +56,10 @@
   shell: "ls -1t {{ releases_path }}|tail -n +{{ keep_releases + 1 }}|xargs rm -rf"
   args:
     chdir: '{{ releases_path }}'
+
+- name: Touch Rollbar
+  rollbar_deployment: token={{ rollbar_token }}
+                      environment='{{ rails_env }}'
+                      user={{ lookup('env', 'USER') }}
+                      rollbar_user={{ rollbar_user }}
+                      revision={{ revision }}
