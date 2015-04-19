@@ -2,6 +2,7 @@
 - hosts: all
   gather_facts: no
   roles:
+    - newrelic
     - { role: apt_proxy, when: use_apt_proxy }
   tasks:
     - name: Install python2.7
