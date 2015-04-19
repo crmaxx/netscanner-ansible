@@ -19,3 +19,7 @@
   when: newrelic_installed|success
   template: src=nrsysmond.cfg.j2 dest=/etc/newrelic/nrsysmond.cfg
   notify: restart nrsysmond
+
+- name: Place New Relic rails configuration template
+  when: newrelic_installed|success
+  template: src=newrelic.yml.j2 dest={{ shared_path }}/config/newrelic.yml

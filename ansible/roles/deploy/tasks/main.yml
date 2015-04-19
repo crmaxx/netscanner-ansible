@@ -22,6 +22,7 @@
   with_items:
     - config/database.yml
     - config/secrets.yml
+    - config/newrelic.yml
     - log
     - tmp
     - vendor/bundle
