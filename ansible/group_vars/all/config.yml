@@ -51,7 +51,7 @@ rails_version: 4
 databases:
   - postgresql
 postgresql_orm: activerecord
-postgresql_db_name: '{{ app_name }}_{{ rails_env }}'
+postgresql_db_name: '{{ app_name }}'
 postgresql_db_user: '{{ app_name }}'
 postgresql_db_password: '{{ app_name }}'
 postgresql_extensions:
